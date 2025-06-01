@@ -1,5 +1,6 @@
 package io.sanity.sdk;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,6 +169,15 @@ public class SanityClient {
         return uploadAsset(file, "files");
     }
 
+    /**
+     * Uploads an asset (e.g., image or file) to the Sanity API.
+     * Constructs an HTTP request to upload the specified file to the appropriate asset endpoint based on the asset type.
+     *
+     * @param file The file to be uploaded. It must exist and be accessible.
+     * @param assetType The type of asset to upload (e.g., "images" or "files").
+     * @return The response body as a string, typically containing details about the uploaded asset.
+     * @throws Exception If an error occurs during the file upload process, such as network issues or invalid inputs.
+     */
     private String uploadAsset(File file, String assetType) throws Exception {
         String endpoint = String.format("https://%s.api.sanity.io/v1/assets/%s/%s",
                 projectId, assetType, dataset);
@@ -182,5 +192,23 @@ public class SanityClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
+
+    public Map<String, Object> buildImageReference(String assetId) {
+        return Map.of(
+                "_type", "image",
+                "asset", Map.of(
+                        "_type", "reference",
+                        "_ref", assetId
+                )
+        );
+    }
+
+
+    public String extractAssetIdFromResponse(String jsonResponse) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(jsonResponse);
+        return root.path("document").path("_id").asText();
+    }
+
 
 }

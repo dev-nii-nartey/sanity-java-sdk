@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -11,6 +12,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +153,30 @@ public class SanityClient {
 
         HttpRequest request = baseRequest("data/mutate")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+
+    public String uploadImage(File imageFile) throws Exception {
+        return uploadAsset(imageFile, "images");
+    }
+
+    public String uploadFile(File file) throws Exception {
+        return uploadAsset(file, "files");
+    }
+
+    private String uploadAsset(File file, String assetType) throws Exception {
+        String endpoint = String.format("https://%s.api.sanity.io/v1/assets/%s/%s",
+                projectId, assetType, dataset);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", "Bearer " + apiToken)
+                .header("Content-Type", Files.probeContentType(file.toPath()))
+                .POST(HttpRequest.BodyPublishers.ofFile(file.toPath()))
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

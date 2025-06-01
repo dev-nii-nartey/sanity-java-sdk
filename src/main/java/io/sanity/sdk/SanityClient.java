@@ -56,8 +56,8 @@ public class SanityClient {
      *
      * @param query The GROQ query to be sent to the Sanity API.
      * @return The response body from the Sanity API as a JSON string.
-     * @throws SanityFetchException If an error occurs while sending the request or processing the response.
-     */
+     * @throws IOException          If an I/O error occurs while sending the request.
+     * @throws InterruptedException If the operation is interrupted while waiting for the response.     */
     public String query(String query) throws IOException, InterruptedException {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
         String url = String.format("https://%s.api.sanity.io/v1/data/query/%s?query=%s", projectId, dataset, encodedQuery);
@@ -98,6 +98,50 @@ public class SanityClient {
         return sendMutation(List.of(mutation));
     }
 
+
+    /**
+     * Updates an existing document in the Sanity dataset by applying the specified updates.
+     * This method constructs a mutation to patch the document with the provided updates
+     * and sends it to the Sanity API.
+     *
+     * @param documentId The ID of the document to be updated.
+     * @param updates A map representing the updates to be applied to the document.
+     *                The keys in the map correspond to the fields to be updated,
+     *                and the values represent the new values for those fields.
+     * @return The response body from the Sanity API as a JSON string, which typically includes details
+     *         about the updated document, such as its ID and revision.
+     * @throws IOException If an I/O error occurs while sending the request.
+     * @throws InterruptedException If the operation is interrupted while waiting for the response.
+     */
+    public String updateDocument(String documentId, Map<String, Object> updates) throws IOException, InterruptedException {
+        Map<String, Object> patch = new HashMap<>();
+        patch.put("id", documentId);
+        patch.put("set", updates);
+
+        Map<String, Object> mutation = new HashMap<>();
+        mutation.put("patch", patch);
+
+        return sendMutation(List.of(mutation));
+    }
+
+
+
+    /**
+     * Deletes a document from the Sanity dataset by sending a delete mutation request to the Sanity API.
+     * This method constructs a mutation to delete the specified document and sends it to the API.
+     *
+     * @param documentId The ID of the document to be deleted.
+     * @return The response body from the Sanity API as a JSON string, which typically includes details
+     *         about the deletion operation.
+     * @throws IOException If an I/O error occurs while sending the request.
+     * @throws InterruptedException If the operation is interrupted while waiting for the response.
+     */
+    public String deleteDocument(String documentId) throws IOException, InterruptedException {
+        Map<String, Object> mutation = new HashMap<>();
+        mutation.put("delete", Map.of("id", documentId));
+
+        return sendMutation(List.of(mutation));
+    }
 
 
     // Shared mutation sender

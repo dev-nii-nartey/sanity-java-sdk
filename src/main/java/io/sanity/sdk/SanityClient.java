@@ -193,6 +193,14 @@ public class SanityClient {
         return response.body();
     }
 
+    /**
+     * Constructs a map representing a reference to an image asset,
+     * including its type and reference ID.
+     *
+     * @param assetId The ID of the image asset to reference.
+     * @return A map containing the image reference structure,
+     *         including the type and reference to the specified asset ID.
+     */
     public Map<String, Object> buildImageReference(String assetId) {
         return Map.of(
                 "_type", "image",
@@ -204,6 +212,16 @@ public class SanityClient {
     }
 
 
+    /**
+     * Extracts the asset ID from the provided JSON response.
+     * Parses the JSON response to locate and return the ID of the asset
+     * from the "document" object's "_id" field.
+     *
+     * @param jsonResponse The JSON response string from which the asset ID is to be extracted.
+     *                     It is expected to contain a "document" object with an "_id" field.
+     * @return The asset ID as a string, extracted from the "_id" field in the JSON response.
+     * @throws Exception If an error occurs while parsing the JSON response.
+     */
     public String extractAssetIdFromResponse(String jsonResponse) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonResponse);

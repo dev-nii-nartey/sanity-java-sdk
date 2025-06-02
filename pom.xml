@@ -4,6 +4,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <name>Sanity Java SDK</name>
+    <description>A lightweight and type-safe Java SDK for interacting with [Sanity CMS](https://www.sanity.io/).
+        Supports GROQ queries, document mutations (create/update/delete), asset uploads, and embedding references in
+        content documents.
+    </description>
+    <url>https://www.devnii.com/sanity-sdk</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Nii Nartey</name>
+            <email>ictkemba@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/dev-nii-nartey/sanity-java-sdk.git</connection>
+        <developerConnection>scm:git:ssh://github.com/dev-nii-nartey/sanity-java-sdk.git</developerConnection>
+        <url>https://github.com/dev-nii-nartey/sanity-java-sdk.git</url>
+    </scm>
+
     <groupId>io.github.dev-nii-nartey</groupId>
     <artifactId>sanity-java-sdk</artifactId>
     <version>1.0.0</version>

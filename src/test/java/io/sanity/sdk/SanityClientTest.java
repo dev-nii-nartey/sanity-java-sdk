@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -250,5 +251,81 @@ class SanityClientTest {
 
         // Assert
         assertEquals(expectedResponse, result);
+    }
+
+    /**
+     * Tests the functionality of the {@code SanityClient.createDocument(Map<String, Object>)} method to ensure
+     * it successfully creates a document for valid input.
+     *
+     * @throws IOException            if an I/O error occurs during the test
+     * @throws InterruptedException   if the test is interrupted during execution
+     * @throws NoSuchFieldException   if reflection fails to access a required field
+     * @throws IllegalAccessException if reflection lacks access permission to modify a required field
+     */
+    @Test
+    void testCreateDocument_Successful() throws IOException, InterruptedException, NoSuchFieldException, IllegalAccessException {
+        // Arrange
+        Map<String, Object> document = Map.of("title", "Test Title", "description", "Test Description");
+        String expectedResponse = "{\"status\":\"success\"}";
+        SanityClient sanityClient = setupSanityClientWithMockResponse(expectedResponse, TEST_TOKEN);
+
+        // Act
+        String result = sanityClient.createDocument(document);
+
+        // Assert
+        assertEquals(expectedResponse, result);
+    }
+
+    /**
+     * Verifies that the {@code SanityClient.createDocument(Map<String, Object>)} method properly handles unauthorized access.
+     *
+     * @throws IOException            if an I/O error occurs during the test
+     * @throws InterruptedException   if the test is interrupted during execution
+     * @throws NoSuchFieldException   if reflection fails to access a required field
+     * @throws IllegalAccessException if reflection lacks permission to modify a required field
+     */
+    @Test
+    void testCreateDocument_Unauthorized() throws IOException, InterruptedException, NoSuchFieldException, IllegalAccessException {
+        // Arrange
+        Map<String, Object> document = Map.of("title", "Test Title", "description", "Test Description");
+        String expectedResponse = "{\"error\":\"Unauthorized\"}";
+        SanityClient sanityClient = setupSanityClientWithMockResponse(expectedResponse, "invalidToken");
+
+        // Act
+        String result = sanityClient.createDocument(document);
+
+        // Assert
+        assertEquals(expectedResponse, result);
+    }
+
+    /**
+     * Tests the behavior of the {@code SanityClient.createDocument(Map<String, Object>)} method when an {@code HttpClient} throws an exception.
+     *
+     * @throws NoSuchFieldException   if reflection fails to access the private {@code httpClient} field in {@code SanityClient}
+     * @throws IllegalAccessException if reflection does not have access permission to modify the {@code httpClient} field in {@code SanityClient}
+     * @throws InterruptedException   if the test is interrupted during execution
+     * @throws IOException            if the simulated {@code HttpClient} throws an {@code IOException}
+     */
+    @Test
+    void testCreateDocument_HttpClientException() throws NoSuchFieldException, IllegalAccessException, InterruptedException, IOException {
+        // Arrange
+        Map<String, Object> document = Map.of("title", "Test Title", "description", "Test Description");
+        HttpClient mockHttpClient = Mockito.mock(HttpClient.class);
+
+        // Configure mock to throw exception
+        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenThrow(new IOException("Simulated HTTP failure"));
+
+        SanityClient sanityClient = new SanityClient(TEST_PROJECT_ID, TEST_DATASET, TEST_TOKEN);
+        java.lang.reflect.Field httpClientField = SanityClient.class.getDeclaredField("httpClient");
+        httpClientField.setAccessible(true);
+        httpClientField.set(sanityClient, mockHttpClient);
+
+        // Act and Assert
+        try {
+            sanityClient.createDocument(document);
+        } catch (IOException e) {
+            assertEquals("Simulated HTTP failure", e.getMessage());
+        }
     }
 }

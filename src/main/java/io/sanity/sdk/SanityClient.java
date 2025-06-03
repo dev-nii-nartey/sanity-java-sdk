@@ -103,16 +103,15 @@ public class SanityClient {
 
 
     /**
-     * Updates an existing document in the Sanity dataset by applying the specified updates.
-     * This method constructs a mutation to patch the document with the provided updates
-     * and sends it to the Sanity API.
+     * Updates an existing document in the Sanity dataset by applying a set of updates.
+     * This method constructs a mutation to patch the specified document with the provided updates
+     * and sends it to the API.
      *
      * @param documentId The ID of the document to be updated.
-     * @param updates A map representing the updates to be applied to the document.
-     *                The keys in the map correspond to the fields to be updated,
-     *                and the values represent the new values for those fields.
+     * @param updates A map containing the updates to apply to the document. Each key-value pair
+     *                represents a field and its updated value.
      * @return The response body from the Sanity API as a JSON string, which typically includes details
-     *         about the updated document, such as its ID and revision.
+     *         about the update operation, such as revisions and document state.
      * @throws IOException If an I/O error occurs while sending the request.
      * @throws InterruptedException If the operation is interrupted while waiting for the response.
      */
